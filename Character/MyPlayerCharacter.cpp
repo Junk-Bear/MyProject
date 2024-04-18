@@ -27,33 +27,38 @@ AMyPlayerCharacter::AMyPlayerCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	// Input
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/MyContents/Input/MyIMC_Default.MyIMC_Default'"));
-	if (InputMappingContextRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/MyContents/Input/MyIMC_Default.MyIMC_Default'"));
+	if (IMCRef.Object)
 	{
-		DefaultMappingContext = InputMappingContextRef.Object;
+		DefaultMappingContext = IMCRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Move.MyIA_Move'"));
-	if (InputActionMoveRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Move.MyIA_Move'"));
+	if (IAMoveRef.Object)
 	{
-		MoveAction = InputActionMoveRef.Object;
+		MoveAction = IAMoveRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionJumpRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Jump.MyIA_Jump'"));
-	if (InputActionJumpRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAJumpRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Jump.MyIA_Jump'"));
+	if (IAJumpRef.Object)
 	{
-		JumpAction = InputActionJumpRef.Object;
+		JumpAction = IAJumpRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionLookRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Look.MyIA_Look'"));
-	if (InputActionLookRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> IALookRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Look.MyIA_Look'"));
+	if (IALookRef.Object)
 	{
-		LookAction = InputActionLookRef.Object;
+		LookAction = IALookRef.Object;
 	}
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionRunRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Run.MyIA_Run'"));
-	if (InputActionLookRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> IARunRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_Run.MyIA_Run'"));
+	if (IARunRef.Object)
 	{
-		RunAction = InputActionRunRef.Object;
+		RunAction = IARunRef.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> IADefalutAttackRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MyContents/Input/InputAction/MyIA_DefaultAttack.MyIA_DefaultAttack'"));
+	if (IADefalutAttackRef.Object)
+	{
+		DefalutAttackAction = IADefalutAttackRef.Object;
 	}
 }
 
@@ -83,6 +88,7 @@ void AMyPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AMyPlayerCharacter::TriggerRun);
 	EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AMyPlayerCharacter::ReleaseRun);
 	EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Canceled, this, &AMyPlayerCharacter::ReleaseRun);
+	EnhancedInputComponent->BindAction(DefalutAttackAction, ETriggerEvent::Triggered, this, &AMyPlayerCharacter::DefaultAttack);
 }
 
 void AMyPlayerCharacter::Move(const FInputActionValue& Value)
@@ -115,6 +121,11 @@ void AMyPlayerCharacter::TriggerRun()
 void AMyPlayerCharacter::ReleaseRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = ControlDataAsset->WalkSpeed;
+}
+
+void AMyPlayerCharacter::DefaultAttack()
+{
+	ProcessComboCommand();
 }
 
 void AMyPlayerCharacter::SetCharacterControlData(const UMyControlDataAsset* InDataAsset)

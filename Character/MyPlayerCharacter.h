@@ -8,13 +8,13 @@
 #include "MyPlayerCharacter.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class MYPROJECT_API AMyPlayerCharacter : public AMyCharacterBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	AMyPlayerCharacter();
 
@@ -49,11 +49,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> RunAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> DefalutAttackAction;
+
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
 	void TriggerRun();
 	void ReleaseRun();
+
+	void DefaultAttack();
 
 	virtual void SetCharacterControlData(const class UMyControlDataAsset* InDataAsset) override;
 };
