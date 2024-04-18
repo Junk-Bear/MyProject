@@ -14,4 +14,9 @@ class MYPROJECT_API AMyCharacterBase : public ACharacter
 public:
 	AMyCharacterBase();
 
+protected:
+	virtual void SetCharacterControlData(const class UMyControlDataAsset* InDataAsset);
+
+	UPROPERTY(EditAnywhere, Category = CharactorControl, Meta=(AllowPrivateAccess = "true"))
+	TObjectPtr<class UMyControlDataAsset> ControlDataAsset;
 };

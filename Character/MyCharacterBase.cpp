@@ -4,6 +4,7 @@
 #include "Character/MyCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "MyControlDataAsset.h"
 
 // Sets default values
 AMyCharacterBase::AMyCharacterBase()
@@ -19,10 +20,9 @@ AMyCharacterBase::AMyCharacterBase()
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
-	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.f, 0.0f);
+	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
@@ -31,17 +31,27 @@ AMyCharacterBase::AMyCharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn_Simple.SKM_Quinn_Simple'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Standard.SK_CharM_Standard'"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/MyContents/Animation/MyABP_Character.MyABP_Character_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UMyControlDataAsset> ControlDataAssetRef(TEXT("/Script/MyProject.MyControlDataAsset'/Game/MyContents/DataAsset/MyDA_Control.MyDA_Control'"));
+	if (ControlDataAssetRef.Object)
+	{
+		ControlDataAsset = ControlDataAssetRef.Object;
+	}
+}
+
+void AMyCharacterBase::SetCharacterControlData(const UMyControlDataAsset* InDataAsset)
+{
+	GetCharacterMovement()->MaxWalkSpeed = InDataAsset->WalkSpeed;
 }
 
