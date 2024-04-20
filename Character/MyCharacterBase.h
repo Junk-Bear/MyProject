@@ -6,10 +6,25 @@
 #include "GameFramework/Character.h"
 #include "Interface/MyAttackAnimationInterface.h"
 #include "Interface/MyCharacterWidgetInterface.h"
+#include "interface/MyItemInterface.h"
 #include "MyCharacterBase.generated.h"
 
+
+DECLARE_LOG_CATEGORY_EXTERN(LogMyCharacter, Log, All);
+
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UMyItemDataAsset* /*InItemData*/);
+USTRUCT(BlueprintType)
+struct FTakeItemDelegateWrapper
+{
+	GENERATED_BODY()
+	FTakeItemDelegateWrapper() {}
+	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
+	FOnTakeItemDelegate ItemDelegate;
+};
+
+
 UCLASS()
-class MYPROJECT_API AMyCharacterBase : public ACharacter, public IMyAttackAnimationInterface, public IMyCharacterWidgetInterface
+class MYPROJECT_API AMyCharacterBase : public ACharacter, public IMyAttackAnimationInterface, public IMyCharacterWidgetInterface, public IMyItemInterface
 {
 	GENERATED_BODY()
 
@@ -67,4 +82,15 @@ protected:
 
 	virtual void SetupCharacterWidget(class UMyUserWidget* InUserWidget) override;
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Weapon;
+
+	UPROPERTY()
+	TArray<FTakeItemDelegateWrapper> TakeItemActions;
+
+	virtual void TakeItem(class UMyItemDataAsset* InItemData) override;
+	virtual void DrinkPotion(class UMyItemDataAsset* InItemData);
+	virtual void EquipWeapon(class UMyItemDataAsset* InItemData);
+	virtual void ReadScroll(class UMyItemDataAsset* InItemData);
 };

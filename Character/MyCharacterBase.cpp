@@ -12,6 +12,9 @@
 #include "CharacterStat/MyCharacterStatComponent.h"
 #include "UI/MyWidgetComponent.h"
 #include "UI/MyHPBarWidget.h"
+#include "Item/MyWeaponItemDataAsset.h"
+
+DEFINE_LOG_CATEGORY(LogMyCharacter);
 
 // Sets default values
 AMyCharacterBase::AMyCharacterBase()
@@ -81,6 +84,13 @@ AMyCharacterBase::AMyCharacterBase()
 		HPBar->SetDrawSize(FVector2D(150.0f, 15.0f));
 		HPBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMyCharacterBase::EquipWeapon)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMyCharacterBase::DrinkPotion)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMyCharacterBase::ReadScroll)));
+
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 }
 
 void AMyCharacterBase::PostInitializeComponents()
@@ -231,5 +241,36 @@ void AMyCharacterBase::SetupCharacterWidget(UMyUserWidget* InUserWidget)
 		HpBarWidget->UpdateHPBar(Stat->GetCurrentHP());
 		Stat->OnHPChanged.AddUObject(HpBarWidget, &UMyHPBarWidget::UpdateHPBar);
 	}
+}
+
+void AMyCharacterBase::TakeItem(UMyItemDataAsset* InItemData)
+{
+	if (InItemData)
+	{
+		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+	}
+}
+
+void AMyCharacterBase::DrinkPotion(UMyItemDataAsset* InItemData)
+{
+	UE_LOG(LogMyCharacter, Log, TEXT("Drink Potion"));
+}
+
+void AMyCharacterBase::EquipWeapon(UMyItemDataAsset* InItemData)
+{
+	UMyWeaponItemDataAsset* WeaponItemData = Cast<UMyWeaponItemDataAsset>(InItemData);
+	if (WeaponItemData)
+	{
+		if (WeaponItemData->WeaponMesh.IsPending())
+		{
+			WeaponItemData->WeaponMesh.LoadSynchronous();
+		}
+		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+	}
+}
+
+void AMyCharacterBase::ReadScroll(UMyItemDataAsset* InItemData)
+{
+	UE_LOG(LogMyCharacter, Log, TEXT("Read Scroll"));
 }
 
