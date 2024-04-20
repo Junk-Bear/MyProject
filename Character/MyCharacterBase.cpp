@@ -8,6 +8,10 @@
 #include "Animation/MyComboDataAsset.h"
 #include "Physics/MyCollisionDefine.h"
 #include "Engine/DamageEvents.h"
+#include "Components/WidgetComponent.h"
+#include "CharacterStat/MyCharacterStatComponent.h"
+#include "UI/MyWidgetComponent.h"
+#include "UI/MyHPBarWidget.h"
 
 // Sets default values
 AMyCharacterBase::AMyCharacterBase()
@@ -63,6 +67,27 @@ AMyCharacterBase::AMyCharacterBase()
 	{
 		DeadMontage = DeadMontageRef.Object;
 	}
+
+	Stat = CreateDefaultSubobject<UMyCharacterStatComponent>(TEXT("Stat"));
+
+	HPBar = CreateDefaultSubobject<UMyWidgetComponent>(TEXT("Widget"));
+	HPBar->SetupAttachment(GetMesh());
+	HPBar->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/MyContents/UI/MyWBP_HPBar.MyWBP_HPBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HPBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HPBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HPBar->SetDrawSize(FVector2D(150.0f, 15.0f));
+		HPBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void AMyCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	Stat->OnHPZero.AddUObject(this, &AMyCharacterBase::SetDead);
 }
 
 void AMyCharacterBase::SetCharacterControlData(const UMyControlDataAsset* InDataAsset)
@@ -177,7 +202,7 @@ float AMyCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	SetDead();
+	Stat->ApplyDamage(DamageAmount);
 
 	return DamageAmount;
 }
@@ -187,6 +212,7 @@ void AMyCharacterBase::SetDead()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayDeadAnimation();
 	SetActorEnableCollision(false);
+	HPBar->SetHiddenInGame(true);
 }
 
 void AMyCharacterBase::PlayDeadAnimation()
@@ -194,5 +220,16 @@ void AMyCharacterBase::PlayDeadAnimation()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.0f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+}
+
+void AMyCharacterBase::SetupCharacterWidget(UMyUserWidget* InUserWidget)
+{
+	UMyHPBarWidget* HpBarWidget = Cast<UMyHPBarWidget>(InUserWidget);
+	if (HpBarWidget)
+	{
+		HpBarWidget->SetMaxHP(Stat->GetMaxHP());
+		HpBarWidget->UpdateHPBar(Stat->GetCurrentHP());
+		Stat->OnHPChanged.AddUObject(HpBarWidget, &UMyHPBarWidget::UpdateHPBar);
+	}
 }
 

@@ -5,15 +5,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/MyAttackAnimationInterface.h"
+#include "Interface/MyCharacterWidgetInterface.h"
 #include "MyCharacterBase.generated.h"
 
 UCLASS()
-class MYPROJECT_API AMyCharacterBase : public ACharacter, public IMyAttackAnimationInterface
+class MYPROJECT_API AMyCharacterBase : public ACharacter, public IMyAttackAnimationInterface, public IMyCharacterWidgetInterface
 {
 	GENERATED_BODY()
 
 public:
 	AMyCharacterBase();
+
+	virtual void PostInitializeComponents() override;
 
 protected:
 	virtual void SetCharacterControlData(const class UMyControlDataAsset* InDataAsset);
@@ -52,4 +55,16 @@ protected:
 	void PlayDeadAnimation();
 
 	float DeadEventDelayTime = 5.0f;
+
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UMyCharacterStatComponent> Stat;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UWidgetComponent> HPBar;
+
+	virtual void SetupCharacterWidget(class UMyUserWidget* InUserWidget) override;
+
 };
