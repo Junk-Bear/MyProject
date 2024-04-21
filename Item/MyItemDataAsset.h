@@ -24,6 +24,12 @@ class MYPROJECT_API UMyItemDataAsset : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
+	FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("ItemDataAsset", GetFName());
+	}
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Type)
 	EItemType Type;
 };

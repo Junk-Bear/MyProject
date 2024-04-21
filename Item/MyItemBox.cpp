@@ -7,6 +7,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Physics/MyCollisionDefine.h"
 #include "Interface/MyItemInterface.h"
+#include "Engine/AssetManager.h"
+#include "MyItemDataAsset.h"
 
 // Sets default values
 AMyItemBox::AMyItemBox()
@@ -20,7 +22,7 @@ AMyItemBox::AMyItemBox()
 	Mesh->SetupAttachment(Trigger);
 	Effect->SetupAttachment(Trigger);
 
-	Trigger->SetCollisionProfileName(CPROFILE_MYTIRGGER);
+	Trigger->SetCollisionProfileName(CPROFILE_MYTRIGGER);
 
 	Trigger->SetBoxExtent(FVector(40.0f, 42.0f, 30.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &AMyItemBox::OnOverlapBegin);
@@ -39,6 +41,26 @@ AMyItemBox::AMyItemBox()
 		Effect->SetTemplate(EffectRef.Object);
 		Effect->bAutoActivate = false;
 	}
+}
+
+void AMyItemBox::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	UAssetManager& Manager = UAssetManager::Get();
+
+	TArray<FPrimaryAssetId> Assets;
+	Manager.GetPrimaryAssetIdList(TEXT("ABItemData"), Assets);
+	ensure(0 < Assets.Num());
+
+	int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
+	FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));
+	if (AssetPtr.IsPending())
+	{
+		AssetPtr.LoadSynchronous();
+	}
+	Item = Cast<UMyItemDataAsset>(AssetPtr.Get());
+	ensure(Item);
 }
 
 void AMyItemBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)

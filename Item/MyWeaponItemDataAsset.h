@@ -15,6 +15,12 @@ class MYPROJECT_API UMyWeaponItemDataAsset : public UMyItemDataAsset
 	GENERATED_BODY()
 
 public:
+	FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("ItemDataAsset", GetFName());
+	}
+
+public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
 	
