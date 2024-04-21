@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/MyItemDataAsset.h"
+#include "GameData/MyStatData.h"
 #include "MyWeaponItemDataAsset.generated.h"
 
 /**
@@ -23,5 +24,7 @@ public:
 public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
-	
+
+	UPROPERTY(EditAnywhere, Category = Stat)
+	FMyStatData ModifierStat;
 };

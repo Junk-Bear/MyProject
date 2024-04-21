@@ -266,6 +266,7 @@ void AMyCharacterBase::EquipWeapon(UMyItemDataAsset* InItemData)
 			WeaponItemData->WeaponMesh.LoadSynchronous();
 		}
 		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+		Stat->SetModifierStat(WeaponItemData->ModifierStat);
 	}
 }
 
