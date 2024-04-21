@@ -14,4 +14,9 @@ class MYPROJECT_API AMyEnemyNPC : public AMyCharacterBase
 {
 	GENERATED_BODY()
 	
+public:
+	AMyEnemyNPC();
+
+protected:
+	void SetDead() override;
 };
