@@ -93,4 +93,8 @@ protected:
 	virtual void DrinkPotion(class UMyItemDataAsset* InItemData);
 	virtual void EquipWeapon(class UMyItemDataAsset* InItemData);
 	virtual void ReadScroll(class UMyItemDataAsset* InItemData);
+
+public:
+	int32 GetLevel();
+	void SetLevel(int32 InNewLevel);
 };

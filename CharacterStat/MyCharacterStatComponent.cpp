@@ -2,18 +2,26 @@
 
 
 #include "CharacterStat/MyCharacterStatComponent.h"
+#include "MyGameSingleton.h"
 
 UMyCharacterStatComponent::UMyCharacterStatComponent()
 {
-	MaxHP = 200.f;
-	CurrentHP = MaxHP;
+	CurrentLevel = 1;
 }
 
 void UMyCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetHP(MaxHP);
+	SetLevelStat(CurrentLevel);
+	SetHP(BaseStat.MaxHP);
+}
+
+void UMyCharacterStatComponent::SetLevelStat(int32 InNewLevel)
+{
+	CurrentLevel = FMath::Clamp(InNewLevel, 1, UMyGameSingleton::Get().CharacterMaxLevel);
+	BaseStat = UMyGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	check(BaseStat.MaxHP > 0.0f);
 }
 
 float UMyCharacterStatComponent::ApplyDamage(float InDamage)
@@ -32,7 +40,7 @@ float UMyCharacterStatComponent::ApplyDamage(float InDamage)
 
 void UMyCharacterStatComponent::SetHP(float NewHP)
 {
-	CurrentHP = FMath::Clamp<float>(NewHP, 0.f, MaxHP);
+	CurrentHP = FMath::Clamp<float>(NewHP, 0.0f, BaseStat.MaxHP);
 
 	OnHPChanged.Broadcast(CurrentHP);
 }

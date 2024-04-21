@@ -28,82 +28,89 @@ enum class EStageState : uint8
 UCLASS()
 class MYPROJECT_API AMyStage : public AActor
 {
-		GENERATED_BODY()
+	GENERATED_BODY()
 
-	public:
-		// Sets default values for this actor's properties
-		AMyStage();
+public:
+	// Sets default values for this actor's properties
+	AMyStage();
 
-	protected:
-		virtual void OnConstruction(const FTransform & Transform) override;
+public:
+	FORCEINLINE int32 GetStageNum() const { return CurrentStageNum; }
+	FORCEINLINE void SetStageNum(int32 NewStageNum) { CurrentStageNum = NewStageNum; }
 
-		// Stage Section
-	protected:
-		UPROPERTY(VisibleAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<class UStaticMeshComponent> Stage;
+protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
 
-		UPROPERTY(VisibleAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<class UBoxComponent> StageTrigger;
+	// Stage Section
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UStaticMeshComponent> Stage;
 
-		UFUNCTION()
-		void OnStageTriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UPROPERTY(VisibleAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UBoxComponent> StageTrigger;
 
-		// Gate Section
-	protected:
-		UPROPERTY(VisibleAnywhere, Category = Gate, Meta = (AllowPrivateAccess = "true"))
-		TMap<FName, TObjectPtr<class UStaticMeshComponent>> Gates;
+	UFUNCTION()
+	void OnStageTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-		UPROPERTY(VisibleAnywhere, Category = Gate, Meta = (AllowPrivateAccess = "true"))
-		TArray<TObjectPtr<class UBoxComponent>> GateTriggers;
+	// Gate Section
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Gate, Meta = (AllowPrivateAccess = "true"))
+	TMap<FName, TObjectPtr<class UStaticMeshComponent>> Gates;
 
-		UFUNCTION()
-		void OnGateTriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UPROPERTY(VisibleAnywhere, Category = Gate, Meta = (AllowPrivateAccess = "true"))
+	TArray<TObjectPtr<class UBoxComponent>> GateTriggers;
 
-		void OpenAllGates();
-		void CloseAllGates();
+	UFUNCTION()
+	void OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-		// State Section
-	protected:
-		UPROPERTY(EditAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
-		EStageState CurrentState;
+	void OpenAllGates();
+	void CloseAllGates();
 
-		void SetState(EStageState InNewState);
+	// State Section
+protected:
+	UPROPERTY(EditAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
+	EStageState CurrentState;
 
-		UPROPERTY()
-		TMap<EStageState, FStageChangedDelegateWrapper> StateChangeActions;
+	void SetState(EStageState InNewState);
 
-		void SetReady();
-		void SetFight();
-		void SetChooseReward();
-		void SetChooseNext();
+	UPROPERTY()
+	TMap<EStageState, FStageChangedDelegateWrapper> StateChangeActions;
 
-		// Fight Section
-	protected:
-		UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<class AMyEnemyNPC> OpponentClass;
+	void SetReady();
+	void SetFight();
+	void SetChooseReward();
+	void SetChooseNext();
 
-		UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
-		float OpponentSpawnTime;
+	// Fight Section
+protected:
+	UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AMyEnemyNPC> OpponentClass;
 
-		UFUNCTION()
-		void OnOpponentDestroyed(AActor * DestroyedActor);
+	UPROPERTY(EditAnywhere, Category = Fight, Meta = (AllowPrivateAccess = "true"))
+	float OpponentSpawnTime;
 
-		FTimerHandle OpponentTimerHandle;
-		void OnOpponentSpawn();
+	UFUNCTION()
+	void OnOpponentDestroyed(AActor* DestroyedActor);
 
-		// Reward Section
-	protected:
-		UPROPERTY(VisibleAnywhere, Category = Reward, Meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<class AMyItemBox> RewardBoxClass;
+	FTimerHandle OpponentTimerHandle;
+	void OnOpponentSpawn();
 
-		UPROPERTY(VisibleAnywhere, Category = Reward, Meta = (AllowPrivateAccess = "true"))
-		TArray<TWeakObjectPtr<class AMyItemBox>> RewardBoxes;
+	// Reward Section
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Reward, Meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AMyItemBox> RewardBoxClass;
 
-		TMap<FName, FVector> RewardBoxLocations;
+	UPROPERTY(VisibleAnywhere, Category = Reward, Meta = (AllowPrivateAccess = "true"))
+	TArray<TWeakObjectPtr<class AMyItemBox>> RewardBoxes;
 
-		UFUNCTION()
-		void OnRewardTriggerBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	TMap<FName, FVector> RewardBoxLocations;
 
-		void SpawnRewardBoxes();
+	UFUNCTION()
+	void OnRewardTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void SpawnRewardBoxes();
+
+protected:
+	UPROPERTY(VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	int32 CurrentStageNum;
 };

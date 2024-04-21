@@ -132,7 +132,7 @@ void AMyCharacterBase::ComboActionBegin()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	// Animation Setting
-	const float AttackSpeedRate = 1.0f;
+	const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(ComboActionMontage, AttackSpeedRate);
 
@@ -156,7 +156,7 @@ void AMyCharacterBase::SetComboCheckTimer()
 	int32 ComboIndex = CurrentCombo - 1;
 	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
 
-	const float AttackSpeedRate = 1.0f;
+	const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) / AttackSpeedRate;
 	if (ComboEffectiveTime > 0.0f)
 	{
@@ -184,9 +184,9 @@ void AMyCharacterBase::AttackHitCheck()
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	const float AttackRange = 40.0f;
+	const float AttackRange = Stat->GetTotalStat().AttackRange;
 	const float AttackRadius = 50.0f;
-	const float AttackDamage = 100.0f;
+	const float AttackDamage = Stat->GetTotalStat().Attack;
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
@@ -237,7 +237,7 @@ void AMyCharacterBase::SetupCharacterWidget(UMyUserWidget* InUserWidget)
 	UMyHPBarWidget* HpBarWidget = Cast<UMyHPBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetMaxHP(Stat->GetMaxHP());
+		HpBarWidget->SetMaxHP(Stat->GetTotalStat().MaxHP);
 		HpBarWidget->UpdateHPBar(Stat->GetCurrentHP());
 		Stat->OnHPChanged.AddUObject(HpBarWidget, &UMyHPBarWidget::UpdateHPBar);
 	}
@@ -272,5 +272,15 @@ void AMyCharacterBase::EquipWeapon(UMyItemDataAsset* InItemData)
 void AMyCharacterBase::ReadScroll(UMyItemDataAsset* InItemData)
 {
 	UE_LOG(LogMyCharacter, Log, TEXT("Read Scroll"));
+}
+
+int32 AMyCharacterBase::GetLevel()
+{
+	return Stat->GetCurrentLevel();
+}
+
+void AMyCharacterBase::SetLevel(int32 InNewLevel)
+{
+	Stat->SetLevelStat(InNewLevel);
 }
 

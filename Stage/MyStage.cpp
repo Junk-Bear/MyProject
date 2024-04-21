@@ -70,6 +70,8 @@ AMyStage::AMyStage()
 		RewardBoxLocations.Add(GateSocket, BoxLocation);
 	}
 
+	// Stage Stat
+	CurrentStageNum = 0;
 }
 
 void AMyStage::OnConstruction(const FTransform& Transform)
@@ -105,7 +107,13 @@ void AMyStage::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponen
 
 	if (!bResult)
 	{
-		GetWorld()->SpawnActor<AMyStage>(NewLocation, FRotator::ZeroRotator);
+		FTransform NewTransform(NewLocation);
+		AMyStage* NewStage = GetWorld()->SpawnActorDeferred<AMyStage>(AMyStage::StaticClass(), NewTransform);
+		if (NewStage)
+		{
+			NewStage->SetStageNum(CurrentStageNum + 1);
+			NewStage->FinishSpawning(NewTransform);
+		}
 	}
 }
 
@@ -189,12 +197,14 @@ void AMyStage::OnOpponentDestroyed(AActor* DestroyedActor)
 
 void AMyStage::OnOpponentSpawn()
 {
-	const FVector SpawnLocation = GetActorLocation() + FVector::UpVector * 88.0f;
-	AActor* OpponentActor = GetWorld()->SpawnActor(OpponentClass, &SpawnLocation, &FRotator::ZeroRotator);
-	AMyEnemyNPC* ABOpponentCharacter = Cast<AMyEnemyNPC>(OpponentActor);
-	if (ABOpponentCharacter)
+	const FTransform SpawnTransform(GetActorLocation() + FVector::UpVector * 88.0f);
+	AActor* OpponentActor = GetWorld()->SpawnActorDeferred<AMyEnemyNPC>(OpponentClass, SpawnTransform);
+	AMyEnemyNPC* EnemyCharacter = Cast<AMyEnemyNPC>(OpponentActor);
+	if (EnemyCharacter)
 	{
-		ABOpponentCharacter->OnDestroyed.AddDynamic(this, &AMyStage::OnOpponentDestroyed);
+		EnemyCharacter->OnDestroyed.AddDynamic(this, &AMyStage::OnOpponentDestroyed);
+		EnemyCharacter->SetLevel(CurrentStageNum);
+		EnemyCharacter->FinishSpawning(SpawnTransform);
 	}
 }
 
