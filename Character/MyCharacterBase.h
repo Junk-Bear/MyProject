@@ -69,7 +69,7 @@ protected:
 	virtual void SetDead();
 	void PlayDeadAnimation();
 
-	float DeadEventDelayTime = 5.0f;
+	float DeadEventDelayTime = 3.0f;
 
 
 protected:

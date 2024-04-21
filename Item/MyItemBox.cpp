@@ -50,7 +50,7 @@ void AMyItemBox::PostInitializeComponents()
 	UAssetManager& Manager = UAssetManager::Get();
 
 	TArray<FPrimaryAssetId> Assets;
-	Manager.GetPrimaryAssetIdList(TEXT("ABItemData"), Assets);
+	Manager.GetPrimaryAssetIdList(TEXT("MyItemDataAsset"), Assets);
 	ensure(0 < Assets.Num());
 
 	int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);

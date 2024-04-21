@@ -26,7 +26,7 @@ class MYPROJECT_API UMyItemDataAsset : public UPrimaryDataAsset
 public:
 	FPrimaryAssetId GetPrimaryAssetId() const override
 	{
-		return FPrimaryAssetId("ItemDataAsset", GetFName());
+		return FPrimaryAssetId("MyItemDataAsset", GetFName());
 	}
 
 public:
