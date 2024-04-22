@@ -7,6 +7,7 @@
 UMyCharacterStatComponent::UMyCharacterStatComponent()
 {
 	CurrentLevel = 1;
+	AttackRadius = 50.f;
 }
 
 void UMyCharacterStatComponent::BeginPlay()
