@@ -8,11 +8,13 @@ UMyCharacterStatComponent::UMyCharacterStatComponent()
 {
 	CurrentLevel = 1;
 	AttackRadius = 50.f;
+
+	bWantsInitializeComponent = true;
 }
 
-void UMyCharacterStatComponent::BeginPlay()
+void UMyCharacterStatComponent::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
 	SetLevelStat(CurrentLevel);
 	SetHP(BaseStat.MaxHP);
@@ -21,7 +23,7 @@ void UMyCharacterStatComponent::BeginPlay()
 void UMyCharacterStatComponent::SetLevelStat(int32 InNewLevel)
 {
 	CurrentLevel = FMath::Clamp(InNewLevel, 1, UMyGameSingleton::Get().CharacterMaxLevel);
-	BaseStat = UMyGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	SetBaseStat(UMyGameSingleton::Get().GetCharacterStat(CurrentLevel));
 	check(BaseStat.MaxHP > 0.0f);
 }
 

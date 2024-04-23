@@ -9,6 +9,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float /*CurrentHp*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FMyStatData& /*BaseStat*/, const FMyStatData& /*ModifierStat*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MYPROJECT_API UMyCharacterStatComponent : public UActorComponent
@@ -20,19 +21,23 @@ public:
 	UMyCharacterStatComponent();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
 
 public:
 	FOnHpZeroDelegate OnHPZero;
 	FOnHpChangedDelegate OnHPChanged;
+	FOnStatChangedDelegate OnStatChanged;
 
 	void SetLevelStat(int32 InNewLevel);
 	FORCEINLINE float GetCurrentLevel() const { return CurrentLevel; }
-	FORCEINLINE void SetModifierStat(const FMyStatData& InModifierStat) { ModifierStat = InModifierStat; }
 	FORCEINLINE FMyStatData GetTotalStat() const { return BaseStat + ModifierStat; }
 	FORCEINLINE float GetCurrentHP() const { return CurrentHP; }
 	FORCEINLINE float GetAttackRadius() const { return AttackRadius; }
+
+	FORCEINLINE const FMyStatData& GetBaseStat() const { return BaseStat; }
+	FORCEINLINE const FMyStatData& GetModifierStat() const { return ModifierStat; }
+	FORCEINLINE void SetBaseStat(const FMyStatData& InBaseStat) { BaseStat = InBaseStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
+	FORCEINLINE void SetModifierStat(const FMyStatData& InModifierStat) { ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
 	float ApplyDamage(float InDamage);
 
 protected:

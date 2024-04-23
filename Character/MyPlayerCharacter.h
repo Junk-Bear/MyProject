@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Character/MyCharacterBase.h"
 #include "InputActionValue.h"
+#include "Interface/MyCharacterHUDInterface.h"
 #include "MyPlayerCharacter.generated.h"
 
 /**
  *
  */
 UCLASS()
-class MYPROJECT_API AMyPlayerCharacter : public AMyCharacterBase
+class MYPROJECT_API AMyPlayerCharacter : public AMyCharacterBase, public IMyCharacterHUDInterface
 {
 	GENERATED_BODY()
 
@@ -61,4 +62,7 @@ protected:
 	void DefaultAttack();
 
 	virtual void SetCharacterControlData(const class UMyControlDataAsset* InDataAsset) override;
+
+protected:
+	virtual void SetupHUDWidget(class UMyHUDWidget* InHUDWidget) override;
 };

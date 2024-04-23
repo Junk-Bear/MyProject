@@ -9,6 +9,8 @@
 #include "InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MyControlDataAsset.h"
+#include "UI/MyHUDWidget.h"
+#include "CharacterStat/MyCharacterStatComponent.h"
 
 AMyPlayerCharacter::AMyPlayerCharacter()
 {
@@ -131,4 +133,16 @@ void AMyPlayerCharacter::DefaultAttack()
 void AMyPlayerCharacter::SetCharacterControlData(const UMyControlDataAsset* InDataAsset)
 {
 	Super::SetCharacterControlData(InDataAsset);
+}
+
+void AMyPlayerCharacter::SetupHUDWidget(UMyHUDWidget* InHUDWidget)
+{
+	if (InHUDWidget)
+	{
+		InHUDWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
+		InHUDWidget->UpdateHPBar(Stat->GetCurrentHP());
+
+		Stat->OnStatChanged.AddUObject(InHUDWidget, &UMyHUDWidget::UpdateStat);
+		Stat->OnHPChanged.AddUObject(InHUDWidget, &UMyHUDWidget::UpdateHPBar);
+	}
 }
