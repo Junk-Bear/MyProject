@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "Item/MyItemDataAsset.h"
 #include "GameData/MyStatData.h"
-#include "MyWeaponItemDataAsset.generated.h"
+#include "MyScrollItemDataAsset.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYPROJECT_API UMyWeaponItemDataAsset : public UMyItemDataAsset
+class MYPROJECT_API UMyScrollItemDataAsset : public UMyItemDataAsset
 {
 	GENERATED_BODY()
-
+	
 public:
-	UMyWeaponItemDataAsset();
+	UMyScrollItemDataAsset();
 
 	FPrimaryAssetId GetPrimaryAssetId() const override
 	{
@@ -24,9 +24,6 @@ public:
 	}
 
 public:
-	UPROPERTY(EditAnywhere, Category = Weapon)
-	TSoftObjectPtr<USkeletalMesh> WeaponMesh;
-
-	UPROPERTY(EditAnywhere, Category = Stat)
-	FMyStatData ModifierStat;
+	UPROPERTY(EditAnywhere, Category = stat)
+	FMyStatData BaseStat;
 };

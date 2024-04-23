@@ -27,6 +27,12 @@ void AMyEnemyNPC::SetDead()
 {
 	Super::SetDead();
 
+	AMyAIController* AIController = Cast<AMyAIController>(GetController());
+	if(AIController)
+	{
+		AIController->StopAI();
+	}
+
 	FTimerHandle DeadTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
 		[&]()

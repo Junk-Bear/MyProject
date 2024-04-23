@@ -1,9 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#pragma once
 
 #include "MyWeaponItemDataAsset.h"
-
-UMyWeaponItemDataAsset::UMyWeaponItemDataAsset()
-{
-	Type = EItemType::Weapon;
-}
+#include "MyScrollItemDataAsset.h"
+#include "MyPotionItemDataAsset.h"

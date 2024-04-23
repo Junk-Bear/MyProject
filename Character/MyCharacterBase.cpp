@@ -12,7 +12,7 @@
 #include "CharacterStat/MyCharacterStatComponent.h"
 #include "UI/MyWidgetComponent.h"
 #include "UI/MyHPBarWidget.h"
-#include "Item/MyWeaponItemDataAsset.h"
+#include "Item/MyItems.h"
 
 DEFINE_LOG_CATEGORY(LogMyCharacter);
 
@@ -63,8 +63,8 @@ AMyCharacterBase::AMyCharacterBase()
 	if (ComboActionDataRef.Object)
 	{
 		ComboActionData = ComboActionDataRef.Object;
-	}	
-	
+	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/MyContents/Animation/MyAM_DefaultAttak.MyAM_DefaultAttak'"));
 	if (ComboActionMontageRef.Object)
 	{
@@ -104,6 +104,7 @@ void AMyCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	Stat->OnHPZero.AddUObject(this, &AMyCharacterBase::SetDead);
+	Stat->OnStatChanged.AddUObject(this, &AMyCharacterBase::ApplyStat);
 }
 
 void AMyCharacterBase::SetCharacterControlData(const UMyControlDataAsset* InDataAsset)
@@ -246,12 +247,13 @@ void AMyCharacterBase::PlayDeadAnimation()
 
 void AMyCharacterBase::SetupCharacterWidget(UMyUserWidget* InUserWidget)
 {
-	UMyHPBarWidget* HpBarWidget = Cast<UMyHPBarWidget>(InUserWidget);
-	if (HpBarWidget)
+	UMyHPBarWidget* HPBarWidget = Cast<UMyHPBarWidget>(InUserWidget);
+	if (HPBarWidget)
 	{
-		HpBarWidget->SetMaxHP(Stat->GetTotalStat().MaxHP);
-		HpBarWidget->UpdateHPBar(Stat->GetCurrentHP());
-		Stat->OnHPChanged.AddUObject(HpBarWidget, &UMyHPBarWidget::UpdateHPBar);
+		HPBarWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
+		HPBarWidget->UpdateHPBar(Stat->GetCurrentHP());
+		Stat->OnHPChanged.AddUObject(HPBarWidget, &UMyHPBarWidget::UpdateHPBar);
+		Stat->OnStatChanged.AddUObject(HPBarWidget, &UMyHPBarWidget::UpdateStat);
 	}
 }
 
@@ -265,7 +267,11 @@ void AMyCharacterBase::TakeItem(UMyItemDataAsset* InItemData)
 
 void AMyCharacterBase::DrinkPotion(UMyItemDataAsset* InItemData)
 {
-	UE_LOG(LogMyCharacter, Log, TEXT("Drink Potion"));
+	UMyPotionItemDataAsset* PotionItemData = Cast<UMyPotionItemDataAsset>(InItemData);
+	if (PotionItemData)
+	{
+		Stat->HealHP(PotionItemData->HealAmount);
+	}
 }
 
 void AMyCharacterBase::EquipWeapon(UMyItemDataAsset* InItemData)
@@ -284,7 +290,11 @@ void AMyCharacterBase::EquipWeapon(UMyItemDataAsset* InItemData)
 
 void AMyCharacterBase::ReadScroll(UMyItemDataAsset* InItemData)
 {
-	UE_LOG(LogMyCharacter, Log, TEXT("Read Scroll"));
+	UMyScrollItemDataAsset* ScrollItemData = Cast<UMyScrollItemDataAsset>(InItemData);
+	if (ScrollItemData)
+	{
+		Stat->AddBaseStat(ScrollItemData->BaseStat);
+	}
 }
 
 int32 AMyCharacterBase::GetLevel()
@@ -295,5 +305,11 @@ int32 AMyCharacterBase::GetLevel()
 void AMyCharacterBase::SetLevel(int32 InNewLevel)
 {
 	Stat->SetLevelStat(InNewLevel);
+}
+
+void AMyCharacterBase::ApplyStat(const FMyStatData& BaseStat, const FMyStatData& ModifierStat)
+{
+	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
 

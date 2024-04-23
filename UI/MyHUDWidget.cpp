@@ -14,7 +14,7 @@ UMyHUDWidget::UMyHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(
 void UMyHUDWidget::UpdateStat(const FMyStatData& BaseStat, const FMyStatData& ModifierStat)
 {
 	FMyStatData TotalStat = BaseStat + ModifierStat;
-	HPBar->SetMaxHP(TotalStat.MaxHP);
+	HPBar->UpdateStat(BaseStat, ModifierStat);
 
 	CharacterStat->UpdateStat(BaseStat, ModifierStat);
 }

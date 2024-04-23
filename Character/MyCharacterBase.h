@@ -7,6 +7,7 @@
 #include "Interface/MyAttackAnimationInterface.h"
 #include "Interface/MyCharacterWidgetInterface.h"
 #include "interface/MyItemInterface.h"
+#include "GameData/MyStatData.h"
 #include "MyCharacterBase.generated.h"
 
 
@@ -98,4 +99,5 @@ protected:
 public:
 	int32 GetLevel();
 	void SetLevel(int32 InNewLevel);
+	void ApplyStat(const FMyStatData& BaseStat, const FMyStatData& ModifierStat);
 };

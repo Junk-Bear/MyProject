@@ -71,9 +71,25 @@ void AMyPlayerCharacter::BeginPlay()
 	SetCharacterControlData(ControlDataAsset);
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		EnableInput(PlayerController);
+	}
+
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+	}
+}
+
+void AMyPlayerCharacter::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
 	}
 }
 

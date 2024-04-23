@@ -38,6 +38,9 @@ public:
 	FORCEINLINE const FMyStatData& GetModifierStat() const { return ModifierStat; }
 	FORCEINLINE void SetBaseStat(const FMyStatData& InBaseStat) { BaseStat = InBaseStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
 	FORCEINLINE void SetModifierStat(const FMyStatData& InModifierStat) { ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
+
+	FORCEINLINE void HealHP(float InHealAmount) { CurrentHP = FMath::Clamp(CurrentHP + InHealAmount, 0, GetTotalStat().MaxHP); OnHPChanged.Broadcast(CurrentHP); }
+	FORCEINLINE void AddBaseStat(const FMyStatData& InAddBaseStat) { BaseStat = BaseStat + InAddBaseStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
 	float ApplyDamage(float InDamage);
 
 protected:

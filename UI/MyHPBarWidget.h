@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
 #include "MyUserWidget.h"
+#include  "GameData/MyStatData.h"
 #include "MyHPBarWidget.generated.h"
 
 /**
@@ -22,12 +22,19 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
-	FORCEINLINE void SetMaxHP(float NewMaxHP) { MaxHP = NewMaxHP; }
+	void UpdateStat(const FMyStatData& BaseStat, const FMyStatData& ModifierStat);
 	void UpdateHPBar(float NewCurrentHP);
+	FString GetHPStatText();
 
 protected:
 	UPROPERTY()
 	TObjectPtr<class UProgressBar> HPProgressBar;
+
+	UPROPERTY()
+	TObjectPtr<class UTextBlock> HPStat;
+
+	UPROPERTY()
+	float CurrentHP;
 
 	UPROPERTY()
 	float MaxHP;
